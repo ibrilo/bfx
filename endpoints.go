@@ -7,14 +7,6 @@ import (
 
 var defaultHTTPScheme = "https"
 
-func queryParamString(params url.Values) string {
-	q := ""
-	if len(params) != 0 {
-		q = "?" + params.Encode()
-	}
-	return q
-}
-
 var (
 	publicRESTDomain  = "api-pub.bitfinex.com"
 	privateRESTDomain = "api.bitfinex.com"
@@ -36,13 +28,13 @@ var (
 		return endpointRESTPublicPath + "/book/" + symbol + "/" + precision + queryParamString(params)
 	}
 	endpointPublicStats = func(key, size, symbol, side, section string, params url.Values) string {
-		return endpointRESTPublicPath + "/stats1/" + strings.Join([]string{key, size, symbol, side}, ":") + "/" + section + queryParamString(params)
+		return endpointRESTPublicPath + "/stats1/" + joinPathParams(key, size, symbol, side) + "/" + section + queryParamString(params)
 	}
 	endpointPublicCandles = func(timeframe, symbol, section string, params url.Values) string {
-		return endpointRESTPublicPath + "/candles/" + strings.Join([]string{"trade", timeframe, symbol}, ":") + "/" + section + queryParamString(params)
+		return endpointRESTPublicPath + "/candles/" + joinPathParams("trade", timeframe, symbol) + "/" + section + queryParamString(params)
 	}
 	endpointPublicConfigs = func(action, object, detail string) string {
-		return endpointRESTPublicPath + "/conf/" + strings.Join([]string{"pub", action, object, detail}, ":")
+		return endpointRESTPublicPath + "/conf/" + joinPathParams("pub", action, object, detail)
 	}
 
 	endpointPublicStatus = "" // TODO: implementation
@@ -51,7 +43,7 @@ var (
 		return endpointRESTPublicPath + "/liquidations/hist" + queryParamString(params)
 	}
 	endpointPublicRankings = func(key, timeframe, symbol, section string, params url.Values) string {
-		return endpointRESTPublicPath + "/rankings/" + strings.Join([]string{key, timeframe, symbol}, ":") + "/" + section + queryParamString(params)
+		return endpointRESTPublicPath + "/rankings/" + joinPathParams(key, timeframe, symbol) + "/" + section + queryParamString(params)
 	}
 	endpointPublicPulseHistory = func(params url.Values) string {
 		return endpointRESTPublicPath + "/pulse/hist" + queryParamString(params)
@@ -63,3 +55,15 @@ var (
 		return endpointRESTPublicPath + "/funding/stats/" + symbol + "/hist"
 	}
 )
+
+func joinPathParams(params ...string) string {
+	return strings.Join(params, ":")
+}
+
+func queryParamString(params url.Values) string {
+	q := ""
+	if len(params) != 0 {
+		q = "?" + params.Encode()
+	}
+	return q
+}
