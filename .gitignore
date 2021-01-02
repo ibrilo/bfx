@@ -1,7 +1,0 @@
-// IDEs metadata
-.vscode/
-.idea/
-
-// Go modules
-vendor/
-go.sum
