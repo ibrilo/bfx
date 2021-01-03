@@ -60,8 +60,9 @@ func (c *Client) PlatformStatus() (int, error) {
 		return -1, err
 	}
 
-	if len(status) <= 1 {
+	if len(status) != 1 {
 		return -1, fmt.Errorf("unexpected response platform status")
 	}
+
 	return status[0], nil
 }
