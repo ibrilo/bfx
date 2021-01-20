@@ -48,6 +48,7 @@ func (t *Ticker) parse(data interface{}) error {
 	case []interface{}:
 		switch len(v) {
 		case 11:
+			t.tickerType = tickerTypeTrade
 			t.Symbol = v[0].(string)
 			t.Bid = v[1].(float64)
 			t.BidSize = v[2].(float64)
@@ -60,6 +61,7 @@ func (t *Ticker) parse(data interface{}) error {
 			t.High = v[9].(float64)
 			t.Low = v[10].(float64)
 		case 17:
+			t.tickerType = tickerTypeFunding
 			t.Symbol = v[0].(string)
 			t.FRR = v[1].(float64)
 			t.Bid = v[2].(float64)
