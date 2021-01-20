@@ -9,7 +9,9 @@ import (
 const retriesRESTLimit = 5
 
 var (
-	ErrNotEnoughParameters  = errors.New("not enough parameters for auth")
+	// ErrNotEnoughParameters TOWRITE
+	ErrNotEnoughParameters = errors.New("not enough parameters for auth")
+	// ErrWrongArgumentsPassed TOWRITE
 	ErrWrongArgumentsPassed = errors.New("wrong argument type was passed")
 )
 
@@ -25,6 +27,7 @@ type Client struct {
 	httpClient *http.Client
 }
 
+// New create new instance for Bitfinex client
 func New(args ...interface{}) (*Client, error) {
 
 	c := &Client{

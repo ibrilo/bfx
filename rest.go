@@ -10,6 +10,7 @@ import (
 )
 
 var (
+	// ErrJSONUnmarshal TOWRITE
 	ErrJSONUnmarshal = errors.New("unmarshal json error")
 )
 
@@ -48,6 +49,7 @@ const (
 	PlatformStatusOperative   = 1
 )
 
+// PlatformStatus TOWRITE
 func (c *Client) PlatformStatus() (int, error) {
 	resp, err := c.request("GET", endpointPublicPlatformStatus, nil, 0)
 	if err != nil {
@@ -65,4 +67,25 @@ func (c *Client) PlatformStatus() (int, error) {
 	}
 
 	return status[0], nil
+}
+
+// Tickers TOWRITE
+func (c *Client) Tickers(symbols ...string) (Tickers, error) {
+	resp, err := c.request("GET", endpointPublicTickers(symbols), nil, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	var data interface{}
+
+	if err := json.Unmarshal(resp, &data); err != nil {
+		return nil, err
+	}
+
+	tickers, err := parseTickers(data)
+	if err != nil {
+		return nil, err
+	}
+
+	return tickers, nil
 }
