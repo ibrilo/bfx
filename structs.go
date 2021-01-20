@@ -97,6 +97,7 @@ func parseTickers(data interface{}) (Tickers, error) {
 			if err := t.parse(elem); err != nil {
 				return nil, ErrParseTicker
 			}
+			set = append(set, t)
 		}
 	default:
 		return nil, ErrParseTicker
