@@ -69,6 +69,28 @@ func (c *Client) PlatformStatus() (int, error) {
 	return status[0], nil
 }
 
+// Ticker TOWRITE
+func (c *Client) Ticker(symbol string) (*Ticker, error) {
+	resp, err := c.request("GET", endpointPublicTicker(symbol), nil, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	var data interface{}
+
+	if err := json.Unmarshal(resp, &data); err != nil {
+		return nil, err
+	}
+
+	var ticker Ticker
+
+	if err := ticker.parse(data); err != nil {
+		return nil, err
+	}
+
+	return &ticker, nil
+}
+
 // Tickers TOWRITE
 func (c *Client) Tickers(symbols ...string) (Tickers, error) {
 	resp, err := c.request("GET", endpointPublicTickers(symbols), nil, 0)
