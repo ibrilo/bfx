@@ -2,7 +2,6 @@ package bfx
 
 import (
 	"errors"
-	"fmt"
 )
 
 // ErrParseTicker TOWRITE
@@ -44,10 +43,23 @@ func (t *Ticker) Type() string {
 }
 
 // Parse will parse data from responses
-func (t *Ticker) parse(data interface{}) error {
+func (t *Ticker) parse(data interface{}, symbol string) error {
 	switch v := data.(type) {
 	case []interface{}:
 		switch len(v) {
+		case 10:
+			t.tickerType = tickerTypeTrade
+			t.Symbol = symbol
+			t.Bid = v[0].(float64)
+			t.BidSize = v[1].(float64)
+			t.Ask = v[2].(float64)
+			t.AskSize = v[3].(float64)
+			t.DailyChange = v[4].(float64)
+			t.DailyChangeRelative = v[5].(float64)
+			t.LastPrice = v[6].(float64)
+			t.Volume = v[7].(float64)
+			t.High = v[8].(float64)
+			t.Low = v[9].(float64)
 		case 11:
 			t.tickerType = tickerTypeTrade
 			t.Symbol = v[0].(string)
@@ -61,6 +73,23 @@ func (t *Ticker) parse(data interface{}) error {
 			t.Volume = v[8].(float64)
 			t.High = v[9].(float64)
 			t.Low = v[10].(float64)
+		case 16:
+			t.tickerType = tickerTypeFunding
+			t.Symbol = symbol
+			t.FRR = v[0].(float64)
+			t.Bid = v[1].(float64)
+			t.BidPeriod = int(v[2].(float64))
+			t.BidSize = v[3].(float64)
+			t.Ask = v[4].(float64)
+			t.AskPeriod = int(v[5].(float64))
+			t.AskSize = v[6].(float64)
+			t.DailyChange = v[7].(float64)
+			t.DailyChangeRelative = v[8].(float64)
+			t.LastPrice = v[9].(float64)
+			t.Volume = v[10].(float64)
+			t.High = v[11].(float64)
+			t.Low = v[12].(float64)
+			t.FRRAmountAvailable = v[15].(float64)
 		case 17:
 			t.tickerType = tickerTypeFunding
 			t.Symbol = v[0].(string)
@@ -79,8 +108,6 @@ func (t *Ticker) parse(data interface{}) error {
 			t.Low = v[13].(float64)
 			t.FRRAmountAvailable = v[16].(float64)
 		default:
-			fmt.Printf("ticker: need []interface{}, has %T\n", data)
-			fmt.Printf("-> \n%v\n", data)
 			return ErrParseTicker
 		}
 	default:
@@ -99,7 +126,7 @@ func parseTickers(data interface{}) (Tickers, error) {
 	case []interface{}:
 		for _, elem := range v {
 			t := Ticker{}
-			if err := t.parse(elem); err != nil {
+			if err := t.parse(elem, ""); err != nil {
 				return nil, ErrParseTicker
 			}
 			set = append(set, t)

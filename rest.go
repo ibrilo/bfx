@@ -84,7 +84,7 @@ func (c *Client) Ticker(symbol string) (*Ticker, error) {
 
 	var ticker Ticker
 
-	if err := ticker.parse(data); err != nil {
+	if err := ticker.parse(data, symbol); err != nil {
 		return nil, err
 	}
 
