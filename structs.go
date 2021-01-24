@@ -80,6 +80,7 @@ func (t *Ticker) parse(data interface{}) error {
 			t.FRRAmountAvailable = v[16].(float64)
 		default:
 			fmt.Printf("ticker: need []interface{}, has %T\n", data)
+			fmt.Printf("len: %d -> \n%v\n", len(data), data)
 			return ErrParseTicker
 		}
 	default:
