@@ -230,11 +230,11 @@ func parseTrades(data interface{}) (trades, error) {
 	}
 
 	for _, trade := range v {
-		t := Trade{}
+		t := &Trade{}
 		if err := t.parse(trade); err != nil {
 			return nil, err
 		}
-		set = append(set, t)
+		set = append(set, *t)
 	}
 
 	return set, nil
