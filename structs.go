@@ -2,6 +2,7 @@ package bfx
 
 import (
 	"errors"
+	"fmt"
 	"time"
 )
 
@@ -194,6 +195,9 @@ func (t *Trade) Type() string {
 func (t *Trade) parse(data interface{}) error {
 	v, ok := data.([]interface{})
 	if !ok {
+		if Debug {
+			fmt.Printf("Passed type: %T\nActually: %v\n", data, data)
+		}
 		return errParseTrade
 	}
 
@@ -210,6 +214,7 @@ func (t *Trade) parse(data interface{}) error {
 		t.Amount = v[2].(float64)
 		t.Rate = v[3].(float64)
 		t.Period = v[4].(int)
+		return nil
 	}
 
 	return errParseTrade
