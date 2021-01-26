@@ -2,10 +2,16 @@ package bfx
 
 import (
 	"errors"
+	"time"
 )
 
 // ErrParseTicker TOWRITE
-var ErrParseTicker = errors.New("failed to parse ticker data. wrong data format")
+var errParseTicker = errors.New("failed to parse ticker data. wrong data format")
+var errParseTickers = errors.New("failed to parse tickers data. wrong format")
+
+// ErrParseTrade TOWRITE
+var errParseTrade = errors.New("failed to parse trade data. wrong data format")
+var errParseTrades = errors.New("failed to parse trades data. wrong data format")
 
 const (
 	tickerTypeTrade = iota
@@ -108,10 +114,10 @@ func (t *Ticker) parse(data interface{}, symbol string) error {
 			t.Low = v[13].(float64)
 			t.FRRAmountAvailable = v[16].(float64)
 		default:
-			return ErrParseTicker
+			return errParseTicker
 		}
 	default:
-		return ErrParseTicker
+		return errParseTicker
 	}
 
 	return nil
@@ -127,12 +133,12 @@ func parseTickers(data interface{}) (Tickers, error) {
 		for _, elem := range v {
 			t := Ticker{}
 			if err := t.parse(elem, ""); err != nil {
-				return nil, ErrParseTicker
+				return nil, err
 			}
 			set = append(set, t)
 		}
 	default:
-		return nil, ErrParseTicker
+		return nil, errParseTickers
 	}
 	return set, nil
 }
@@ -157,4 +163,74 @@ func (tics Tickers) Fundings() Tickers {
 		}
 	}
 	return set
+}
+
+const (
+	tradeTypeTrade = iota
+	tradeTypeFunding
+)
+
+var tradeTypes = map[int]string{
+	tradeTypeTrade:   "trade",
+	tradeTypeFunding: "funding",
+}
+
+// Trade TOWRITE
+type Trade struct {
+	tradeType int
+	ID        int
+	MTS       time.Time
+	Amount    float64
+	Price     float64
+	Rate      float64
+	Period    int
+}
+
+// Type TOWRITE
+func (t *Trade) Type() string {
+	return tradeTypes[t.tradeType]
+}
+
+func (t *Trade) parse(data interface{}) error {
+	v, ok := data.([]interface{})
+	if !ok {
+		return errParseTrade
+	}
+
+	if len(v) == 4 {
+		t.ID = v[0].(int)
+		t.MTS = time.Unix(v[1].(int64), 0)
+		t.Amount = v[2].(float64)
+		t.Price = v[3].(float64)
+		return nil
+	}
+	if len(v) == 5 {
+		t.ID = v[0].(int)
+		t.MTS = time.Unix(v[1].(int64), 0)
+		t.Amount = v[2].(float64)
+		t.Rate = v[3].(float64)
+		t.Period = v[4].(int)
+	}
+
+	return errParseTrade
+}
+
+type trades []Trade
+
+func parseTrades(data interface{}) (trades, error) {
+	var set trades
+	v, ok := data.([]interface{})
+	if !ok {
+		return nil, errParseTrades
+	}
+
+	for _, trade := range v {
+		t := Trade{}
+		if err := t.parse(trade); err != nil {
+			return nil, err
+		}
+		set = append(set, t)
+	}
+
+	return set, nil
 }

@@ -7,11 +7,15 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
+	"strconv"
+	"time"
 )
 
 var (
 	// ErrJSONUnmarshal TOWRITE
 	ErrJSONUnmarshal = errors.New("unmarshal json error")
+	errStartAfterEnd = errors.New("start timespamp after end")
 )
 
 func (c *Client) request(method string, url string, b []byte, attempt int) (response []byte, err error) {
@@ -110,4 +114,46 @@ func (c *Client) Tickers(symbols ...string) (Tickers, error) {
 	}
 
 	return tickers, nil
+}
+
+// Trades TOWRITE
+func (c *Client) Trades(symbol string, limit int, start, end time.Time, olderFirst bool) ([]Trade, error) {
+	params := url.Values{}
+	if limit > 0 {
+		if limit > 10000 {
+			limit = 10000
+		}
+		params.Set("limit", strconv.Itoa(limit))
+	}
+
+	if start.After(end) {
+		return nil, errStartAfterEnd
+	}
+
+	params.Set("start", strconv.Itoa(int(start.Unix())))
+	params.Set("end", strconv.Itoa(int(end.Unix())))
+
+	sort := "-1"
+	if olderFirst {
+		sort = "1"
+	}
+	params.Set("sort", sort)
+
+	resp, err := c.request("GET", endpointPublicTrades(symbol, params), nil, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	var data interface{}
+
+	if err := json.Unmarshal(resp, &data); err != nil {
+		return nil, err
+	}
+
+	trades, err := parseTrades(data)
+	if err != nil {
+		return nil, err
+	}
+
+	return trades, nil
 }
