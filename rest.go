@@ -141,6 +141,7 @@ func (c *Client) Trades(symbol string, limit int, start, end time.Time, olderFir
 
 	if Debug {
 		fmt.Println(endpointPublicTrades(symbol, params))
+		fmt.Println(params)
 	}
 	resp, err := c.request("GET", endpointPublicTrades(symbol, params), nil, 0)
 	if err != nil {

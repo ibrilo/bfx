@@ -22,7 +22,7 @@ var (
 		return endpointRESTPublicPath + "/ticker/" + symbol
 	}
 	endpointPublicTrades = func(symbol string, params url.Values) string {
-		return endpointRESTPublicPath + "/trades/" + symbol + "/hyst" + queryParamString(params)
+		return endpointRESTPublicPath + "/trades/" + symbol + "/hist" + queryParamString(params)
 	}
 	endpointPublicBook = func(symbol, precision string, params url.Values) string {
 		return endpointRESTPublicPath + "/book/" + symbol + "/" + precision + queryParamString(params)
