@@ -117,7 +117,7 @@ func (c *Client) Tickers(symbols ...string) (Tickers, error) {
 }
 
 // Trades TOWRITE
-func (c *Client) Trades(symbol string, limit int, start, end time.Time, olderFirst bool) ([]Trade, error) {
+func (c *Client) Trades(symbol string, limit int, start, end *time.Time, olderFirst bool) ([]Trade, error) {
 	params := url.Values{}
 	if limit > 0 {
 		if limit > 10000 {
@@ -126,12 +126,17 @@ func (c *Client) Trades(symbol string, limit int, start, end time.Time, olderFir
 		params.Set("limit", strconv.Itoa(limit))
 	}
 
-	if start.After(end) {
-		return nil, errStartAfterEnd
+	if start != nil {
+		params.Set("start", strconv.Itoa(int(start.UnixNano())))
 	}
 
-	params.Set("start", strconv.Itoa(int(start.Unix())))
-	params.Set("end", strconv.Itoa(int(end.Unix())))
+	if end != nil {
+		if start.After(*end) {
+			return nil, errStartAfterEnd
+		}
+
+		params.Set("end", strconv.Itoa(int(end.UnixNano())))
+	}
 
 	sort := "-1"
 	if olderFirst {
