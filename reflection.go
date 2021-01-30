@@ -66,6 +66,7 @@ func parseBool(v interface{}) Bool {
 	if !ok {
 		fmt.Printf("%t is not a bool. failed to convert to bool.\n", val)
 	}
+	return Bool{val}
 }
 
 func (b Bool) Bool() bool {
