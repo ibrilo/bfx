@@ -2,9 +2,12 @@ package bfx
 
 import (
 	"errors"
-	"fmt"
 	"time"
 )
+
+type abstractSlice []interface{}
+
+var errRESTError = errors.New("REST api return error!")
 
 // ErrParseTicker TOWRITE
 var errParseTicker = errors.New("failed to parse ticker data. wrong data format")
@@ -193,12 +196,14 @@ func (t *Trade) Type() string {
 }
 
 func (t *Trade) parse(data interface{}) error {
-	v, ok := data.([]interface{})
+	v, ok := data.(abstractSlice)
 	if !ok {
-		if Debug {
-			fmt.Printf("Passed type: %T\nActually: %v\n", data, data)
-		}
 		return errParseTrade
+	}
+
+	if e := restError(v); e != nil {
+		e.print()
+		return errRESTError
 	}
 
 	if len(v) == 4 {
