@@ -201,11 +201,6 @@ func (t *Trade) parse(data interface{}) error {
 		return errParseTrade
 	}
 
-	if e := restError(v); e != nil {
-		e.print()
-		return errRESTError
-	}
-
 	if len(v) == 4 {
 		t.ID = v[0].(int)
 		t.MTS = time.Unix(v[1].(int64), 0)
@@ -232,6 +227,11 @@ func parseTrades(data interface{}) (trades, error) {
 	v, ok := data.([]interface{})
 	if !ok {
 		return nil, errParseTrades
+	}
+
+	if e := restError(v); e != nil {
+		e.print()
+		return nil, errRESTError
 	}
 
 	for _, trade := range v {
